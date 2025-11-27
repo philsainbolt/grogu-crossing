@@ -9,6 +9,7 @@ class Game {
         this.enemies = [];
         this.score = 0;
         this.lives = 3;
+        this.highScore = this.loadHighScore();
         this.isGameOver = false;
         this.isRunning = false;
         this.lastTime = 0;
@@ -23,6 +24,11 @@ class Game {
         this.startScreen = document.getElementById('start-screen');
         this.gameOverScreen = document.getElementById('game-over-screen');
         this.uiLayer = document.getElementById('ui-layer');
+        this.startHighScoreElement = document.getElementById('start-high-score');
+        this.endHighScoreElement = document.getElementById('end-high-score');
+
+        // Display initial high score on start screen
+        this.startHighScoreElement.textContent = this.highScore;
     }
 
     initEnemies() {
@@ -55,6 +61,9 @@ class Game {
         this.lives = 3;
         this.player.reset();
         this.updateUI();
+
+        // Update high score display (in case it was beaten)
+        this.startHighScoreElement.textContent = this.highScore;
 
         this.startScreen.classList.add('hidden');
         this.gameOverScreen.classList.add('hidden');
@@ -135,7 +144,9 @@ class Game {
     gameWin() {
         this.isRunning = false;
         this.isGameOver = true;
+        this.saveHighScore();
         this.finalScoreElement.textContent = this.score;
+        this.endHighScoreElement.textContent = this.highScore;
         this.gameOverMessage.textContent = "This is the way!";
         this.gameOverScreen.classList.remove('hidden');
         this.uiLayer.classList.add('hidden');
@@ -157,7 +168,9 @@ class Game {
     gameOver() {
         this.isRunning = false;
         this.isGameOver = true;
+        this.saveHighScore();
         this.finalScoreElement.textContent = this.score;
+        this.endHighScoreElement.textContent = this.highScore;
         this.gameOverMessage.textContent = "The Empire caught you!";
         this.gameOverScreen.classList.remove('hidden');
         this.uiLayer.classList.add('hidden');
@@ -171,6 +184,17 @@ class Game {
     handleInput(key) {
         if (this.isRunning && !this.isGameOver) {
             this.player.handleInput(key);
+        }
+    }
+
+    loadHighScore() {
+        return parseInt(localStorage.getItem('groguHighScore')) || 0;
+    }
+
+    saveHighScore() {
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            localStorage.setItem('groguHighScore', this.highScore);
         }
     }
 }

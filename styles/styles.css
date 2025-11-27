@@ -84,3 +84,9 @@ button:hover {
     font-weight: bold;
     text-shadow: 1px 1px 2px black;
 }
+
+.high-score {
+    color: #ffd700;
+    font-weight: bold;
+    text-shadow: 0 0 10px #ffd700;
+}

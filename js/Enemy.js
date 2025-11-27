@@ -1,8 +1,8 @@
 class Enemy extends Entity {
     constructor(x, y, speed, type) {
-        let imagePath = 'images/enemy1.png';
-        if (type === 2) imagePath = 'images/enemy2.png';
-        if (type === 3) imagePath = 'images/enemy3.png';
+        let imagePath = 'images/stormtrooper.png';
+        if (type === 2) imagePath = 'images/tie-fighter.png';
+        if (type === 3) imagePath = 'images/mando.png';
 
         super(x, y, 60, 60, imagePath);
         this.speed = speed;
