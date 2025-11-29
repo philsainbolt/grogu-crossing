@@ -1,35 +1,35 @@
-# 🌌 Grogu Crossing
+# Grogu Crossing
 
-A Mandalorian-themed Frogger-style game where you help Grogu navigate through space, avoiding enemies from the Star Wars universe.
+A Mandalorian-themed Frogger-style game where you help Grogu navigate through space, avoiding enemies and hazards from the Star Wars universe.
 
-![Grogu Crossing Gameplay](images/grogu.png)
+## About
 
-## 🎮 About
+Grogu Crossing is a browser-based arcade game inspired by the classic Frogger. Guide the adorable Grogu across a dangerous space field filled with flying enemies, laser fire, and asteroids. Collect golden eggs for bonus points as you make your way to safety!
 
-Grogu Crossing is a browser-based arcade game inspired by the classic Frogger. Guide the adorable Grogu across a dangerous space field filled with flying enemies. Dodge Mandalorians, Stormtroopers, and TIE Fighters as you make your way to safety!
-
-## 🕹️ How to Play
+## How to Play
 
 1. Open `index.html` in your web browser
 2. Click **Start Game**
 3. Use the **Arrow Keys** to move Grogu:
-   - ⬆️ Up
-   - ⬇️ Down
-   - ⬅️ Left
-   - ➡️ Right
-4. Avoid all enemies flying across the screen
-5. Reach the top of the screen to win!
+   - Up / Down / Left / Right
+4. Avoid all enemies, lasers, and asteroids
+5. Collect golden eggs for bonus points (+100)
+6. Reach the top of the screen to win (+500 points)
 
-## 🎯 Game Features
+## Game Features
 
 - **Classic Frogger Gameplay** with a Star Wars twist
-- **Multiple Enemy Types** with varying speeds
-- **Lives System** - Get hit and lose a life
-- **Score Tracking** - Earn points for reaching the goal
-- **Responsive Controls** - Smooth keyboard input
-- **Space Theme** - Beautiful starfield background
+- **Multiple Enemy Types**:
+  - Stormtroopers - Some shoot red laser blasts
+  - TIE Fighters - Zig-zag movement pattern
+  - Mandalorians - Standard patrol movement
+- **Cosmic Hazards** - Random asteroids fly across the screen
+- **Collectibles** - Golden eggs spawn for bonus points
+- **Lives System** - Start with 3 lives
+- **High Score** - Persists in localStorage
+- **Idle Animation** - Grogu falls asleep with a Zzz bubble after 3 seconds of no movement
 
-## 🛠️ Technical Details
+## Technical Details
 
 Built with vanilla web technologies:
 - **HTML5** - Game structure
@@ -41,24 +41,28 @@ Built with vanilla web technologies:
 
 ```
 grogu-crossing/
-├── index.html          # Main game page
+├── index.html
+├── README.md
 ├── styles/
-│   └── styles.css      # Game styling
+│   └── styles.css
 ├── js/
-│   ├── index.js        # Entry point
-│   ├── Game.js         # Game loop and state management
+│   ├── index.js        # Entry point and event handling
+│   ├── Game.js         # Game loop, state, and collision detection
 │   ├── Entity.js       # Base class for game objects
-│   ├── Player.js       # Grogu player logic
-│   └── Enemy.js        # Enemy obstacle logic
+│   ├── Player.js       # Grogu player logic and idle sleep
+│   ├── Enemy.js        # Enemy logic (movement, shooting, zig-zag)
+│   ├── Laser.js        # Stormtrooper laser projectiles
+│   ├── Asteroid.js     # Random cosmic hazard asteroids
+│   └── Collectible.js  # Golden egg collectibles
 └── images/
-    ├── bg.png          # Space background
-    ├── grogu.png       # Player sprite
-    ├── enemy1.png      # Mandalorian sprite
-    ├── enemy2.png      # Stormtrooper sprite
-    └── enemy3.png      # TIE Fighter sprite
+    ├── bg.png              # Space background
+    ├── grogu.png           # Player sprite
+    ├── stormtrooper.png    # Stormtrooper sprite
+    ├── tie-fighter.png     # TIE Fighter sprite
+    └── mando.png           # Mandalorian sprite
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -71,42 +75,13 @@ grogu-crossing/
    git clone https://github.com/yourusername/grogu-crossing.git
    ```
 
-2. Navigate to the project directory:
-   ```bash
-   cd grogu-crossing
-   ```
+2. Open `index.html` in your browser
 
-3. Open `index.html` in your browser:
-   ```bash
-   # On Windows
-   start index.html
-   
-   # On macOS
-   open index.html
-   
-   # On Linux
-   xdg-open index.html
-   ```
-
-## 🎨 Credits
+## Credits
 
 - **Game Design**: Inspired by Frogger
 - **Theme**: The Mandalorian / Star Wars universe
-- **Development**: Built as a learning project
 
-## 📝 License
+## License
 
 This project is for educational purposes. Star Wars and The Mandalorian are properties of Lucasfilm/Disney.
-
-## 🤝 Contributing
-
-Feel free to fork this project and add your own features! Some ideas:
-- Add more enemy types
-- Implement difficulty levels
-- Add sound effects and music
-- Create multiple levels
-- Add power-ups
-
----
-
-**May the Force be with you!** 🌟

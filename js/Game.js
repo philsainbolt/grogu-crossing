@@ -7,6 +7,13 @@ class Game {
 
         this.player = new Player(this.width, this.height);
         this.enemies = [];
+        this.lasers = [];
+        this.asteroids = [];
+        this.asteroidTimer = 0;
+        this.asteroidSpawnInterval = 4 + Math.random() * 2;
+        this.collectibles = [];
+        this.collectibleTimer = 0;
+        this.collectibleSpawnInterval = 5 + Math.random() * 3;
         this.score = 0;
         this.lives = 3;
         this.highScore = this.loadHighScore();
@@ -35,37 +42,37 @@ class Game {
 
     initEnemies() {
         this.enemies = [];
-        // Row 1 (3 enemies, spacing ~286)
-        this.enemies.push(new Enemy(0, 60, 100, 1, this.width));
+        // Row 1 (3 Stormtroopers, first one shoots)
+        this.enemies.push(new Enemy(0, 60, 100, 1, this.width, true));
         this.enemies.push(new Enemy(287, 60, 100, 1, this.width));
         this.enemies.push(new Enemy(573, 60, 100, 1, this.width));
 
-        // Row 2 (2 enemies, spacing 430)
+        // Row 2 (2 TIE Fighters)
         this.enemies.push(new Enemy(800, 140, -200, 2, this.width));
         this.enemies.push(new Enemy(370, 140, -200, 2, this.width));
 
-        // Row 3 (2 enemies, spacing 430)
+        // Row 3 (2 Mandos)
         this.enemies.push(new Enemy(0, 220, 150, 3, this.width));
         this.enemies.push(new Enemy(430, 220, 150, 3, this.width));
 
-        // Row 4 (2 enemies, spacing 430)
-        this.enemies.push(new Enemy(800, 300, -120, 1, this.width));
+        // Row 4 (2 Stormtroopers, first one shoots)
+        this.enemies.push(new Enemy(800, 300, -120, 1, this.width, true));
         this.enemies.push(new Enemy(370, 300, -120, 1, this.width));
 
-        // Row 5 (2 enemies, spacing 430)
+        // Row 5 (2 TIE Fighters)
         this.enemies.push(new Enemy(0, 380, 250, 2, this.width));
         this.enemies.push(new Enemy(430, 380, 250, 2, this.width));
 
-        // Row 6 (2 enemies, spacing 430)
+        // Row 6 (2 Mandos)
         this.enemies.push(new Enemy(800, 460, -180, 3, this.width));
         this.enemies.push(new Enemy(370, 460, -180, 3, this.width));
 
-        // Row 7 (3 enemies, spacing ~286)
-        this.enemies.push(new Enemy(0, 540, 120, 1, this.width));
+        // Row 7 (3 Stormtroopers, first one shoots)
+        this.enemies.push(new Enemy(0, 540, 120, 1, this.width, true));
         this.enemies.push(new Enemy(287, 540, 120, 1, this.width));
         this.enemies.push(new Enemy(573, 540, 120, 1, this.width));
 
-        // Row 8 (2 enemies, spacing 430)
+        // Row 8 (2 TIE Fighters)
         this.enemies.push(new Enemy(800, 620, -220, 2, this.width));
         this.enemies.push(new Enemy(370, 620, -220, 2, this.width));
     }
@@ -75,6 +82,13 @@ class Game {
         this.isGameOver = false;
         this.score = 0;
         this.lives = 3;
+        this.lasers = [];
+        this.asteroids = [];
+        this.asteroidTimer = 0;
+        this.asteroidSpawnInterval = 4 + Math.random() * 2;
+        this.collectibles = [];
+        this.collectibleTimer = 0;
+        this.collectibleSpawnInterval = 5 + Math.random() * 3;
         this.player.reset();
         this.updateUI();
 
@@ -103,9 +117,43 @@ class Game {
 
     update(dt) {
         this.player.update(dt);
-        this.enemies.forEach(enemy => enemy.update(dt));
+
+        // Update enemies and collect any new lasers
+        this.enemies.forEach(enemy => {
+            const laserData = enemy.update(dt);
+            if (laserData) {
+                this.lasers.push(new Laser(laserData.x, laserData.y, laserData.direction, this.width));
+            }
+        });
+
+        // Update lasers and remove inactive ones
+        this.lasers.forEach(laser => laser.update(dt));
+        this.lasers = this.lasers.filter(laser => laser.active);
+
+        // Spawn and update asteroids
+        this.asteroidTimer += dt;
+        if (this.asteroidTimer >= this.asteroidSpawnInterval) {
+            this.asteroids.push(new Asteroid(this.width, this.height));
+            this.asteroidTimer = 0;
+            this.asteroidSpawnInterval = 4 + Math.random() * 2;
+        }
+        this.asteroids.forEach(asteroid => asteroid.update(dt));
+        this.asteroids = this.asteroids.filter(asteroid => asteroid.active);
+
+        // Spawn and update collectibles
+        this.collectibleTimer += dt;
+        if (this.collectibleTimer >= this.collectibleSpawnInterval) {
+            this.spawnCollectible();
+            this.collectibleTimer = 0;
+            this.collectibleSpawnInterval = 5 + Math.random() * 3;
+        }
+        this.collectibles.forEach(c => c.update(dt));
+        this.collectibles = this.collectibles.filter(c => c.active);
 
         this.checkCollisions();
+        this.checkLaserCollisions();
+        this.checkAsteroidCollisions();
+        this.checkCollectibleCollisions();
         this.checkWin();
     }
 
@@ -114,7 +162,10 @@ class Game {
 
         // Draw "safe zones" or lanes if needed (visuals are mostly in bg.png)
 
+        this.collectibles.forEach(c => c.render(this.ctx));
         this.enemies.forEach(enemy => enemy.render(this.ctx));
+        this.lasers.forEach(laser => laser.render(this.ctx));
+        this.asteroids.forEach(asteroid => asteroid.render(this.ctx));
         this.player.render(this.ctx);
     }
 
@@ -146,6 +197,86 @@ class Game {
             ) {
                 this.handleDeath();
                 return;
+            }
+        }
+    }
+
+    checkLaserCollisions() {
+        const playerBounds = this.player.getBounds();
+        const hitbox = {
+            x: playerBounds.x + 10,
+            y: playerBounds.y + 10,
+            width: playerBounds.width - 20,
+            height: playerBounds.height - 20
+        };
+
+        for (const laser of this.lasers) {
+            const lb = laser.getBounds();
+            if (
+                hitbox.x < lb.x + lb.width &&
+                hitbox.x + hitbox.width > lb.x &&
+                hitbox.y < lb.y + lb.height &&
+                hitbox.y + hitbox.height > lb.y
+            ) {
+                laser.active = false;
+                this.handleDeath();
+                return;
+            }
+        }
+    }
+
+    checkAsteroidCollisions() {
+        const playerBounds = this.player.getBounds();
+        const hitbox = {
+            x: playerBounds.x + 10,
+            y: playerBounds.y + 10,
+            width: playerBounds.width - 20,
+            height: playerBounds.height - 20
+        };
+
+        for (const asteroid of this.asteroids) {
+            const ab = asteroid.getBounds();
+            // Reduce asteroid hitbox slightly for fairness
+            const asteroidHitbox = {
+                x: ab.x + 5,
+                y: ab.y + 5,
+                width: ab.width - 10,
+                height: ab.height - 10
+            };
+
+            if (
+                hitbox.x < asteroidHitbox.x + asteroidHitbox.width &&
+                hitbox.x + hitbox.width > asteroidHitbox.x &&
+                hitbox.y < asteroidHitbox.y + asteroidHitbox.height &&
+                hitbox.y + hitbox.height > asteroidHitbox.y
+            ) {
+                asteroid.active = false;
+                this.handleDeath();
+                return;
+            }
+        }
+    }
+
+    spawnCollectible() {
+        const x = 50 + Math.random() * (this.width - 100);
+        const y = 50 + Math.random() * (this.height - 150);
+        this.collectibles.push(new Collectible(x, y));
+    }
+
+    checkCollectibleCollisions() {
+        const playerBounds = this.player.getBounds();
+
+        for (const collectible of this.collectibles) {
+            const cb = collectible.getBounds();
+            if (
+                playerBounds.x < cb.x + cb.width &&
+                playerBounds.x + playerBounds.width > cb.x &&
+                playerBounds.y < cb.y + cb.height &&
+                playerBounds.y + playerBounds.height > cb.y
+            ) {
+                collectible.active = false;
+                this.score += collectible.points;
+                this.updateUI();
             }
         }
     }
