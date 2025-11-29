@@ -16,7 +16,7 @@ class Game {
 
         this.initEnemies();
 
-        // UI Elements
+        // UI
         this.scoreElement = document.getElementById('score');
         this.livesElement = document.getElementById('lives');
         this.finalScoreElement = document.getElementById('final-score');
@@ -27,31 +27,47 @@ class Game {
         this.startHighScoreElement = document.getElementById('start-high-score');
         this.endHighScoreElement = document.getElementById('end-high-score');
 
-        // Display initial high score on start screen
+        // Update high score display (in case it was beaten)
         this.startHighScoreElement.textContent = this.highScore;
     }
 
+
+
     initEnemies() {
         this.enemies = [];
-        // Row 1
-        this.enemies.push(new Enemy(0, 60, 100, 1));
-        this.enemies.push(new Enemy(200, 60, 100, 1));
-        this.enemies.push(new Enemy(400, 60, 100, 1));
+        // Row 1 (3 enemies, spacing ~286)
+        this.enemies.push(new Enemy(0, 60, 100, 1, this.width));
+        this.enemies.push(new Enemy(287, 60, 100, 1, this.width));
+        this.enemies.push(new Enemy(573, 60, 100, 1, this.width));
 
-        // Row 2 (Fast, opposite direction)
-        this.enemies.push(new Enemy(600, 140, -200, 2));
-        this.enemies.push(new Enemy(300, 140, -200, 2));
+        // Row 2 (2 enemies, spacing 430)
+        this.enemies.push(new Enemy(800, 140, -200, 2, this.width));
+        this.enemies.push(new Enemy(370, 140, -200, 2, this.width));
 
-        // Row 3
-        this.enemies.push(new Enemy(0, 220, 150, 3));
-        this.enemies.push(new Enemy(300, 220, 150, 3));
+        // Row 3 (2 enemies, spacing 430)
+        this.enemies.push(new Enemy(0, 220, 150, 3, this.width));
+        this.enemies.push(new Enemy(430, 220, 150, 3, this.width));
 
-        // Row 4
-        this.enemies.push(new Enemy(600, 300, -120, 1));
-        this.enemies.push(new Enemy(200, 300, -120, 1));
+        // Row 4 (2 enemies, spacing 430)
+        this.enemies.push(new Enemy(800, 300, -120, 1, this.width));
+        this.enemies.push(new Enemy(370, 300, -120, 1, this.width));
 
-        // Row 5
-        this.enemies.push(new Enemy(0, 380, 250, 2));
+        // Row 5 (2 enemies, spacing 430)
+        this.enemies.push(new Enemy(0, 380, 250, 2, this.width));
+        this.enemies.push(new Enemy(430, 380, 250, 2, this.width));
+
+        // Row 6 (2 enemies, spacing 430)
+        this.enemies.push(new Enemy(800, 460, -180, 3, this.width));
+        this.enemies.push(new Enemy(370, 460, -180, 3, this.width));
+
+        // Row 7 (3 enemies, spacing ~286)
+        this.enemies.push(new Enemy(0, 540, 120, 1, this.width));
+        this.enemies.push(new Enemy(287, 540, 120, 1, this.width));
+        this.enemies.push(new Enemy(573, 540, 120, 1, this.width));
+
+        // Row 8 (2 enemies, spacing 430)
+        this.enemies.push(new Enemy(800, 620, -220, 2, this.width));
+        this.enemies.push(new Enemy(370, 620, -220, 2, this.width));
     }
 
     start() {
