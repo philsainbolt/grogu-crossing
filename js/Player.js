@@ -1,4 +1,9 @@
 class Player extends Entity {
+    // Private fields - internal sleep/idle state (encapsulation)
+    #idleTime = 0;
+    #isSleeping = false;
+    #zzzOffset = 0;
+
     constructor(gameWidth, gameHeight) {
         super(gameWidth / 2 - 25, gameHeight - 60, 50, 50, 'images/grogu.png');
         this.gameWidth = gameWidth;
@@ -6,25 +11,38 @@ class Player extends Entity {
         this.speed = 50; // Pixels per move
         this.moving = false;
 
-        // Idle/sleep state
-        this.idleTime = 0;
-        this.isSleeping = false;
-        this.zzzOffset = 0;
+        // Easter egg tracking
+        this.leftEdgeIdleTime = 0;
+
+        // Force power state
+        this.forceActive = false;
     }
 
     update(dt) {
-        this.idleTime += dt;
-        this.zzzOffset += dt * 2;
+        this.#idleTime += dt;
+        this.#zzzOffset += dt * 2;
 
-        if (this.idleTime >= 3) {
-            this.isSleeping = true;
+        if (this.#idleTime >= 3) {
+            this.#isSleeping = true;
         }
+
+        // Easter egg: track time at left edge + bottom
+        if (this.x < this.speed && this.y >= this.gameHeight - 60) {
+            this.leftEdgeIdleTime += dt;
+        } else {
+            this.leftEdgeIdleTime = 0;
+        }
+    }
+
+    isEasterEggReady() {
+        return this.leftEdgeIdleTime >= 1 && this.x < this.speed && this.y >= this.gameHeight - 60;
     }
 
     handleInput(key) {
         // Wake up on any movement
-        this.idleTime = 0;
-        this.isSleeping = false;
+        this.#idleTime = 0;
+        this.#isSleeping = false;
+        this.leftEdgeIdleTime = 0;
 
         switch (key) {
             case 'ArrowUp':
@@ -44,12 +62,24 @@ class Player extends Entity {
     }
 
     render(ctx) {
+        // Draw Force glow aura if active
+        if (this.forceActive) {
+            ctx.save();
+            ctx.shadowColor = '#00bfff';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = 'rgba(0, 191, 255, 0.3)';
+            ctx.beginPath();
+            ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 35, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
         // Draw sprite as normal
         super.render(ctx);
 
         // Draw floating Zzz in bubble if sleeping
-        if (this.isSleeping) {
-            const floatY = Math.sin(this.zzzOffset) * 5;
+        if (this.#isSleeping) {
+            const floatY = Math.sin(this.#zzzOffset) * 5;
             const bubbleX = this.x + this.width + 5;
             const bubbleY = this.y - 15 + floatY;
 
@@ -87,7 +117,9 @@ class Player extends Entity {
     reset() {
         this.x = this.gameWidth / 2 - 25;
         this.y = this.gameHeight - 60;
-        this.idleTime = 0;
-        this.isSleeping = false;
+        this.#idleTime = 0;
+        this.#isSleeping = false;
+        this.leftEdgeIdleTime = 0;
+        // Note: forceActive is NOT reset - Force persists for rest of game
     }
 }

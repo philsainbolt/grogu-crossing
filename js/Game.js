@@ -14,6 +14,14 @@ class Game {
         this.collectibles = [];
         this.collectibleTimer = 0;
         this.collectibleSpawnInterval = 5 + Math.random() * 3;
+
+        // Easter egg state
+        this.frog = null;
+        this.easterEggTriggered = false;
+        this.forceActive = false;
+        this.forceMessageTimer = 0;
+        this.showForceMessage = false;
+
         this.score = 0;
         this.lives = 3;
         this.highScore = this.loadHighScore();
@@ -89,6 +97,15 @@ class Game {
         this.collectibles = [];
         this.collectibleTimer = 0;
         this.collectibleSpawnInterval = 5 + Math.random() * 3;
+
+        // Reset easter egg state
+        this.frog = null;
+        this.easterEggTriggered = false;
+        this.forceActive = false;
+        this.showForceMessage = false;
+        this.forceMessageTimer = 0;
+        this.player.forceActive = false;
+
         this.player.reset();
         this.updateUI();
 
@@ -155,6 +172,26 @@ class Game {
         this.checkAsteroidCollisions();
         this.checkCollectibleCollisions();
         this.checkWin();
+
+        // Easter egg trigger check
+        if (!this.easterEggTriggered && this.player.isEasterEggReady()) {
+            this.spawnFrog();
+            this.easterEggTriggered = true;
+        }
+
+        // Update frog if exists
+        if (this.frog && this.frog.active) {
+            this.frog.update(dt);
+            this.checkFrogCollision();
+        }
+
+        // Force message timer
+        if (this.showForceMessage) {
+            this.forceMessageTimer += dt;
+            if (this.forceMessageTimer >= 3) {
+                this.showForceMessage = false;
+            }
+        }
     }
 
     render() {
@@ -166,7 +203,30 @@ class Game {
         this.enemies.forEach(enemy => enemy.render(this.ctx));
         this.lasers.forEach(laser => laser.render(this.ctx));
         this.asteroids.forEach(asteroid => asteroid.render(this.ctx));
+
+        // Render frog
+        if (this.frog && this.frog.active) {
+            this.frog.render(this.ctx);
+        }
+
         this.player.render(this.ctx);
+
+        // Render Force message popup
+        if (this.showForceMessage) {
+            this.ctx.save();
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.ctx.fillRect(this.width / 2 - 150, this.height / 2 - 40, 300, 80);
+
+            this.ctx.strokeStyle = '#00bfff';
+            this.ctx.lineWidth = 3;
+            this.ctx.strokeRect(this.width / 2 - 150, this.height / 2 - 40, 300, 80);
+
+            this.ctx.font = 'bold 24px Arial';
+            this.ctx.fillStyle = '#00bfff';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('The Force is with you!', this.width / 2, this.height / 2 + 8);
+            this.ctx.restore();
+        }
     }
 
     checkCollisions() {
@@ -277,6 +337,43 @@ class Game {
                 collectible.active = false;
                 this.score += collectible.points;
                 this.updateUI();
+            }
+        }
+    }
+
+    spawnFrog() {
+        this.frog = new Frog(this.height);
+    }
+
+    checkFrogCollision() {
+        if (!this.frog || !this.frog.active) return;
+
+        const playerBounds = this.player.getBounds();
+        const frogBounds = this.frog.getBounds();
+
+        if (
+            playerBounds.x < frogBounds.x + frogBounds.width &&
+            playerBounds.x + playerBounds.width > frogBounds.x &&
+            playerBounds.y < frogBounds.y + frogBounds.height &&
+            playerBounds.y + playerBounds.height > frogBounds.y
+        ) {
+            this.activateForce();
+            this.frog.active = false;
+        }
+    }
+
+    activateForce() {
+        this.forceActive = true;
+        this.player.forceActive = true;
+        this.showForceMessage = true;
+        this.forceMessageTimer = 0;
+
+        // Halve all enemy speeds
+        for (let enemy of this.enemies) {
+            enemy.speed = enemy.speed / 2;
+            // Also halve zig-zag frequency for TIE fighters
+            if (enemy.frequency) {
+                enemy.frequency = enemy.frequency / 2;
             }
         }
     }
