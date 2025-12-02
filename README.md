@@ -61,7 +61,7 @@ There's a secret Easter egg that unlocks a special power-up!
 
 ## Technical Details
 
-Built with vanilla web technologies:
+Built with:
 - **HTML5** - Game structure
 - **CSS3** - Styling and layout
 - **JavaScript (ES6)** - Game logic using OOP principles with ES6 classes and private fields
