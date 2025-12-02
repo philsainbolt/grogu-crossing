@@ -13,7 +13,7 @@ class Game {
         this.asteroidSpawnInterval = 4 + Math.random() * 2;
         this.collectibles = [];
         this.collectibleTimer = 0;
-        this.collectibleSpawnInterval = 5 + Math.random() * 3;
+        this.collectibleSpawnInterval = 2.5 + Math.random() * 2;
 
         // Easter egg state
         this.frog = null;
@@ -96,7 +96,7 @@ class Game {
         this.asteroidSpawnInterval = 4 + Math.random() * 2;
         this.collectibles = [];
         this.collectibleTimer = 0;
-        this.collectibleSpawnInterval = 5 + Math.random() * 3;
+        this.collectibleSpawnInterval = 2.5 + Math.random() * 2;
 
         // Reset easter egg state
         this.frog = null;
@@ -162,7 +162,7 @@ class Game {
         if (this.collectibleTimer >= this.collectibleSpawnInterval) {
             this.spawnCollectible();
             this.collectibleTimer = 0;
-            this.collectibleSpawnInterval = 5 + Math.random() * 3;
+            this.collectibleSpawnInterval = 2.5 + Math.random() * 2;
         }
         this.collectibles.forEach(c => c.update(dt));
         this.collectibles = this.collectibles.filter(c => c.active);

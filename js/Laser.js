@@ -22,7 +22,7 @@ class Laser {
         const boltHeight = 5;
         const gap = 16;
 
-        // Draw two rounded blaster bolts
+        // Draw rounded blaster bolts
         for (let i = 0; i < 3; i++) {
             const boltX = this.x + i * (boltWidth + gap);
             const boltY = this.y;
